@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, PlusCircle, Users, LogOut } from 'lucide-react'
+import { Home, PlusCircle, Users, LogOut, ArrowDownRight, ArrowUpRight, ShieldAlert } from 'lucide-react'
 
 export default function DashboardLayout({ children }) {
   const { user, role, logout } = useAuth()
@@ -26,6 +26,23 @@ export default function DashboardLayout({ children }) {
         
         {/* Navigation Links */}
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
+          {/* Main Dashboard */}
+          <Link to="/" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/') ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+            <Home size={20} className={isActive('/') ? 'text-green-600' : 'text-gray-400'} />
+            Dashboard
+          </Link>
+
+          {/* New: Aamdani Page */}
+          <Link to="/added" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/added') ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+            <ArrowDownRight size={20} className={isActive('/added') ? 'text-green-600' : 'text-gray-400'} />
+            Aamdani (Added)
+          </Link>
+
+          {/* New: Kharcha Page */}
+          <Link to="/subtracted" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/subtracted') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+            <ArrowUpRight size={20} className={isActive('/subtracted') ? 'text-red-600' : 'text-gray-400'} />
+            Kharcha (Subtracted)
+          </Link>
           {/* Sab ke liye (Everyone) */}
           <Link 
             to="/" 
@@ -55,18 +72,19 @@ export default function DashboardLayout({ children }) {
           )}
 
           {/* Sirf Super Admin ke liye */}
-          {role === 'super_admin' && (
-            <Link 
-              to="/users" 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${
-                isActive('/users') 
-                  ? 'bg-green-50 text-green-700' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Users size={20} className={isActive('/users') ? 'text-green-600' : 'text-gray-400'} />
-              Users Manage Karein
-            </Link>
+         {role === 'super_admin' && (
+            <>
+              <Link to="/users" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/users') ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <Users size={20} className={isActive('/users') ? 'text-purple-600' : 'text-gray-400'} />
+                Users Manage Karein
+              </Link>
+              
+              {/* NAYA LINK: Super Admin Dashboard */}
+              <Link to="/super-admin" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/super-admin') ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <ShieldAlert size={20} className={isActive('/super-admin') ? 'text-purple-600' : 'text-gray-400'} />
+                Super Admin Panel (CRUD)
+              </Link>
+            </>
           )}
         </nav>
 
