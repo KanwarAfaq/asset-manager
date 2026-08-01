@@ -9,22 +9,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Page load hone par check karo ke user logged in hai ya nahi
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchUserRole(session.user.id)
-      } else {
-        setLoading(false)
-      }
+      if (session?.user) fetchUserRole(session.user.id)
+      else setLoading(false)
     })
 
-    // Agar user login ya logout kare, toh state update karo
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchUserRole(session.user.id)
-      } else {
+      if (session?.user) fetchUserRole(session.user.id)
+      else {
         setRole(null)
         setLoading(false)
       }
@@ -33,16 +27,22 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Database se user ka role (admin/member) nikalo
-  const fetchUserRole = async (userId) => {
+ const fetchUserRole = async (userId) => {
     const { data, error } = await supabase
       .from('users')
-      .select('role')
+      .select('role, full_name, avatar_url')
       .eq('id', userId)
-      .single()
+      .maybeSingle() //[cite: 2]
     
-    if (data) setRole(data.role)
-    setLoading(false)
+    if (data) {
+      setRole(data.role) //[cite: 2]
+      // Hum extra data user object mein daal rahe hain
+      setUser(prev => ({ ...prev, dbData: data })) //[cite: 2]
+    } else {
+      // NAYA: Fallback agar user public table mein na mile
+      setRole('member')
+    }
+    setLoading(false) //[cite: 2]
   }
 
   const logout = () => supabase.auth.signOut()
@@ -54,5 +54,4 @@ export const AuthProvider = ({ children }) => {
   )
 }
 
-// Custom hook banaya taake asani se use kar sakein
 export const useAuth = () => useContext(AuthContext)
