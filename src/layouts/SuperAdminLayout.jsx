@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 export default function SuperAdminLayout() {
   const [isSidebarOpen, setSidebarOpen] = useState(false) // Mobile par default band rahay ga
   const location = useLocation()
-  const { user, role, logOut } = useAuth()
+  const { user, role, logout } = useAuth()
   const [profile, setProfile] = useState({ full_name: '', avatar_url: '' })
 
   // Screen size check karke desktop par sidebar open rakhne ka logic
@@ -113,7 +113,7 @@ export default function SuperAdminLayout() {
               <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>
           </div>
-          <button onClick={logOut} className={`w-full mt-2 flex items-center gap-3 px-3 py-2 text-red-500 font-medium hover:bg-red-50 rounded-xl transition-colors ${!isSidebarOpen && 'justify-center md:justify-start'}`}>
+          <button onClick={logout} className={`w-full mt-2 flex items-center gap-3 px-3 py-2 text-red-500 font-medium hover:bg-red-50 rounded-xl transition-colors ${!isSidebarOpen && 'justify-center md:justify-start'}`}>
             <LogOut size={20} />
             <span className={`${!isSidebarOpen && 'hidden md:block'}`}>Log Out</span>
           </button>
