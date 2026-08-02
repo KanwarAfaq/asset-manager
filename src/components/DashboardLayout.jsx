@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, ArrowDownRight, ArrowUpRight, Users, ShieldAlert, LogOut, User, PlusCircle } from 'lucide-react'
+import { Home, ArrowDownRight, ArrowUpRight, Users, ShieldAlert, LogOut, User, PlusCircle, Printer } from 'lucide-react'
 
 export default function DashboardLayout({ children }) {
   const { user, role, logout } = useAuth()
@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }) {
       {/* ======================================= */}
       {/* DESKTOP SIDEBAR                         */}
       {/* ======================================= */}
-      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col shadow-sm z-20">
+      <aside className="print:hidden w-64 bg-white border-r border-gray-200 hidden md:flex flex-col shadow-sm z-20 ">
         
         {/* Profile Header */}
         <div className="p-6 border-b border-gray-100 flex items-center gap-4">
@@ -70,6 +70,9 @@ export default function DashboardLayout({ children }) {
               <Link to="/super-admin" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/super-admin') ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}>
                 <ShieldAlert size={20} className={isActive('/super-admin') ? 'text-purple-600' : 'text-gray-400'} /> App Settings
               </Link>
+              <Link to="/reports" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/reports') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+            <Printer size={20} className={isActive('/reports') ? 'text-blue-600' : 'text-gray-400'} /> Reports
+          </Link>
             </>
           )}
         </nav>
@@ -109,7 +112,7 @@ export default function DashboardLayout({ children }) {
       {/* ======================================= */}
       {/* MOBILE BOTTOM NAVIGATION                */}
       {/* ======================================= */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center z-20 pb-safe">
+      <div className="print:hidden md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center z-20 pb-safe">
         
         <Link to="/" className={`flex flex-col items-center justify-center w-full py-3 ${isActive('/') ? 'text-green-600' : 'text-gray-400'}`}>
           <Home size={22} className={isActive('/') ? 'fill-green-100' : ''} />

@@ -7,6 +7,7 @@ import AddTransaction from './pages/AddTransaction'
 import Users from './pages/Users'
 import CategoryHistory from './pages/CategoryHistory'
 import SuperAdmin from './pages/SuperAdmin'
+import Reports from './pages/Reports'
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth()
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/subtracted" element={<ProtectedRoute><CategoryHistory type="subtraction" /></ProtectedRoute>} />
           <Route path="/super-admin" element={<ProtectedRoute><SuperAdmin /></ProtectedRoute>} />
           <Route path="/add" element={<ProtectedRoute><AddTransaction /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
