@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, ArrowDownRight, ArrowUpRight, Users, ShieldAlert, LogOut, User, PlusCircle, Printer } from 'lucide-react'
+import { Home, ArrowDownRight, ArrowUpRight, Users, ShieldAlert, LogOut, User, PlusCircle, Printer, Tag } from 'lucide-react'
 
 export default function DashboardLayout({ children }) {
   const { user, role, logout } = useAuth()
@@ -72,6 +72,9 @@ export default function DashboardLayout({ children }) {
               </Link>
               <Link to="/reports" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/reports') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}>
             <Printer size={20} className={isActive('/reports') ? 'text-blue-600' : 'text-gray-400'} /> Reports
+          </Link>
+          <Link to="/manage-categories" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${isActive('/manage-categories') ? 'bg-yellow-50 text-yellow-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+            <Tag size={20} className={isActive('/manage-categories') ? 'text-yellow-600' : 'text-gray-400'} /> Manage Categories
           </Link>
             </>
           )}

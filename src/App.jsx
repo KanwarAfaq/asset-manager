@@ -1,16 +1,20 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
 import Login from '@/pages/Login'
 import DashboardLayout from './components/DashboardLayout'
+import SuperAdminLayout from './layouts/SuperAdminLayout' 
 import History from './pages/History'
 import AddTransaction from './pages/AddTransaction'
 import Users from './pages/Users'
 import CategoryHistory from './pages/CategoryHistory'
 import SuperAdmin from './pages/SuperAdmin'
 import Reports from './pages/Reports'
-// Protected Route Wrapper
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth()
+import ManageCategories from './pages/ManageCategories'
+import Overview from './pages/Overview' // NAYA: Overview Page
+import Settings from './pages/Settings' // NAYA: Settings Placeholder
+
+const ProtectedRoute = () => {
+  const { user, loading, role } = useAuth()
   
   if (loading) {
     return (
@@ -24,31 +28,16 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />
   }
   
-  return <DashboardLayout>{children}</DashboardLayout>
+  if (role === 'super_admin') {
+    return <SuperAdminLayout />
+  }
+
+  return (
+    <DashboardLayout>
+      <Outlet />
+    </DashboardLayout>
+  )
 }
-
-// --- Placeholder Pages (Inko hum agle steps mein mukammal karenge) ---
-
-const HistoryPage = () => (
-  <div>
-    <h1 className="text-2xl font-bold text-gray-800 mb-6">Sabqi Tafseelat (All Transactions)</h1>
-    <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm text-center">
-      <p className="text-gray-500">Yahan hum database se assets aur receipts fetch karke table banayenge...</p>
-    </div>
-  </div>
-)
-
-
-const UsersPage = () => (
-  <div>
-    <h1 className="text-2xl font-bold text-gray-800 mb-6">Users Manage Karein (Super Admin)</h1>
-    <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm text-center">
-      <p className="text-gray-500">Yahan Super Admin logon ka role (Admin/Member) change kar sakega...</p>
-    </div>
-  </div>
-)
-
-// --- Main App ---
 
 export default function App() {
   return (
@@ -56,15 +45,23 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><History /></ProtectedRoute>} />
-          <Route path="/" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
-        <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-          <Route path="/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
-          <Route path="/added" element={<ProtectedRoute><CategoryHistory type="addition" /></ProtectedRoute>} />
-          <Route path="/subtracted" element={<ProtectedRoute><CategoryHistory type="subtraction" /></ProtectedRoute>} />
-          <Route path="/super-admin" element={<ProtectedRoute><SuperAdmin /></ProtectedRoute>} />
-          <Route path="/add" element={<ProtectedRoute><AddTransaction /></ProtectedRoute>} />
-          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+          
+          <Route element={<ProtectedRoute />}>
+            {/* FIXED ROUTES */}
+            <Route path="/" element={<Overview />} /> {/* Home ab Overview hai */}
+            <Route path="/transactions" element={<History />} /> {/* History list yahan aayegi */}
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/categories" element={<ManageCategories />} />
+            <Route path="/team" element={<Users />} />
+            <Route path="/settings" element={<Settings />} /> 
+            
+            {/* OTHER ROUTES */}
+            <Route path="/added" element={<CategoryHistory type="addition" />} />
+            <Route path="/subtracted" element={<CategoryHistory type="subtraction" />} />
+            <Route path="/super-admin" element={<SuperAdmin />} />
+            <Route path="/add" element={<AddTransaction />} />
+          </Route>
+          
         </Routes>
       </Router>
     </AuthProvider>

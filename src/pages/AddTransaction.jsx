@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -8,15 +8,30 @@ export default function AddTransaction() {
   const { user, role } = useAuth()
   const navigate = useNavigate()
   
-  const [type, setType] = useState('addition') // 'addition' ya 'subtraction'
+  const [type, setType] = useState('addition') 
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const [receiptFile, setReceiptFile] = useState(null)
   
+  // NAYA: Database se categories mangwane ka state
+  const [category, setCategory] = useState('')
+  const [categoriesList, setCategoriesList] = useState([])
+  
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ text: '', type: '' })
 
-  // Agar user member hai, usko yahan aane ki ijazat nahi hai
+  // Database se categories fetch karna
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase.from('categories').select('name').order('name')
+      if (data && data.length > 0) {
+        setCategoriesList(data)
+        setCategory(data[0].name) // Pehli category ko default set kar dein
+      }
+    }
+    fetchCategories()
+  }, [])
+
   if (role === 'member') {
     return (
       <div className="p-8 text-center text-red-600 bg-red-50 rounded-xl border border-red-200">
@@ -26,7 +41,6 @@ export default function AddTransaction() {
     )
   }
 
-  // Cloudinary par image upload karne ka function
   const uploadToCloudinary = async (file) => {
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
     const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
@@ -45,7 +59,7 @@ export default function AddTransaction() {
     
     if (!response.ok) throw new Error('Image upload fail ho gayi')
     const data = await response.json()
-    return data.secure_url // Cloudinary se wapis aane wala direct link
+    return data.secure_url 
   }
 
   const handleSubmit = async (e) => {
@@ -56,12 +70,10 @@ export default function AddTransaction() {
     try {
       let receipt_url = null
 
-      // Agar raseed (receipt) di gayi hai, toh pehle usay upload karo
       if (receiptFile) {
         receipt_url = await uploadToCloudinary(receiptFile)
       }
 
-      // Supabase mein data save karo
       const { error } = await supabase
         .from('transactions')
         .insert([
@@ -69,6 +81,7 @@ export default function AddTransaction() {
             type: type,
             name: name,
             price: Number(price),
+            category: category, 
             receipt_url: receipt_url,
             created_by: user.id
           }
@@ -78,12 +91,11 @@ export default function AddTransaction() {
 
       setMessage({ text: 'Zabardast! Data mehfooz ho gaya.', type: 'success' })
       
-      // Form ko saaf karo
       setName('')
       setPrice('')
+      if(categoriesList.length > 0) setCategory(categoriesList[0].name)
       setReceiptFile(null)
       
-      // 1.5 seconds baad wapis History page par bhej do
       setTimeout(() => navigate('/'), 1500)
 
     } catch (error) {
@@ -103,7 +115,7 @@ export default function AddTransaction() {
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           
-          {/* Type Selection (Addition / Subtraction) */}
+          {/* Type Selection */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-3">Indraj ki Qisam (Type)</label>
             <div className="grid grid-cols-2 gap-4">
@@ -154,6 +166,20 @@ export default function AddTransaction() {
                 required
               />
             </div>
+          </div>
+
+          {/* NAYA: Dynamic Category Dropdown */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Category (Qisam)</label>
+            <select 
+              value={category} 
+              onChange={(e) => setCategory(e.target.value)} 
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-800 appearance-none cursor-pointer"
+            >
+              {categoriesList.map((cat) => (
+                <option key={cat.name} value={cat.name}>{cat.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Receipt Upload */}

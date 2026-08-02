@@ -10,6 +10,7 @@ export default function TransactionNotesModal({ isOpen, onClose, transaction }) 
   const [newNote, setNewNote] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  
 
   useEffect(() => {
     if (isOpen && transaction) {

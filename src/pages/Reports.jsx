@@ -1,12 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { format } from 'date-fns'
 import { Printer, Calendar, ArrowRight } from 'lucide-react'
 import { useTransactions } from '@/hooks/useTransactions'
+import { supabase } from '@/lib/supabase'
 
 export default function Reports() {
   const { allTransactions, loading } = useTransactions()
   
-  // Default to current month
   const date = new Date()
   const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0]
   const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0]
@@ -14,7 +14,30 @@ export default function Reports() {
   const [startDate, setStartDate] = useState(firstDay)
   const [endDate, setEndDate] = useState(lastDay)
 
-  // Filter Data & Calculate Totals based on selected dates
+  // NAYA: Database se categories aur unke colors mangwane ka state
+  const [dbCategories, setDbCategories] = useState([])
+
+  useEffect(() => {
+    const fetchCats = async () => {
+      const { data } = await supabase.from('categories').select('name, color')
+      if (data) setDbCategories(data)
+    }
+    fetchCats()
+  }, [])
+
+  // NAYA: Yeh function ab database se color dhoondega
+  const getCategoryBadge = (categoryName) => {
+    const cat = categoryName || 'General';
+    const foundCategory = dbCategories.find(c => c.name === cat);
+    const badgeStyle = foundCategory ? foundCategory.color : 'bg-gray-100 text-gray-700 border-gray-200';
+
+    return (
+      <span className={`px-2.5 py-1 text-[11px] font-bold rounded-full border ${badgeStyle} print:border-gray-400 print:text-black print:bg-transparent`}>
+        {cat}
+      </span>
+    )
+  }
+
   const reportData = useMemo(() => {
     const filtered = allTransactions.filter(txn => {
       const d = new Date(txn.created_at)
@@ -35,9 +58,6 @@ export default function Reports() {
   return (
     <div className="max-w-5xl mx-auto bg-white p-4 md:p-8 rounded-2xl shadow-sm border border-gray-100">
       
-      {/* ======================================= */}
-      {/* SCREEN CONTROLS (Hidden on Print)       */}
-      {/* ======================================= */}
       <div className="print:hidden mb-8 space-y-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Print Report</h1>
@@ -62,12 +82,8 @@ export default function Reports() {
         </div>
       </div>
 
-      {/* ======================================= */}
-      {/* PRINTABLE REPORT AREA                   */}
-      {/* ======================================= */}
       <div className="print:block text-black">
         
-        {/* Report Header */}
         <div className="text-center mb-6 pb-6 border-b-2 border-gray-800">
           <h1 className="text-3xl font-black uppercase tracking-widest mb-2">Hisaab Report</h1>
           <div className="flex items-center justify-center gap-2 text-gray-600 font-medium">
@@ -78,7 +94,6 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Summary Boxes */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="p-4 border-2 border-gray-300 rounded-xl text-center bg-gray-50 print:bg-transparent">
             <p className="text-sm font-bold text-gray-500 uppercase mb-1">Kul Aamdani</p>
@@ -94,20 +109,20 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Transactions Table */}
         <table className="w-full text-left border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100 print:bg-gray-200">
-              <th className="p-3 border border-gray-300 font-bold">Tareekh</th>
-              <th className="p-3 border border-gray-300 font-bold">Tafseel</th>
-              <th className="p-3 border border-gray-300 font-bold text-center">Qisam</th>
-              <th className="p-3 border border-gray-300 font-bold text-right">Raqam</th>
+              <th className="p-3 border border-gray-300 font-bold text-sm">Tareekh</th>
+              <th className="p-3 border border-gray-300 font-bold text-sm">Tafseel</th>
+              <th className="p-3 border border-gray-300 font-bold text-sm text-center">Category</th>
+              <th className="p-3 border border-gray-300 font-bold text-sm text-center">Qisam</th>
+              <th className="p-3 border border-gray-300 font-bold text-sm text-right">Raqam</th>
             </tr>
           </thead>
           <tbody>
             {reportData.transactions.length === 0 ? (
               <tr>
-                <td colSpan="4" className="p-6 text-center text-gray-500 font-medium border border-gray-300">
+                <td colSpan="5" className="p-6 text-center text-gray-500 font-medium border border-gray-300">
                   Muntakhib kardah tareekh mein koi record nahi.
                 </td>
               </tr>
@@ -117,11 +132,21 @@ export default function Reports() {
                   <td className="p-3 border border-gray-300 text-sm whitespace-nowrap">
                     {format(new Date(txn.created_at), 'dd MMM yyyy, hh:mm a')}
                   </td>
-                  <td className="p-3 border border-gray-300 font-medium">{txn.name}</td>
+                  <td className="p-3 border border-gray-300 font-medium text-sm">{txn.name}</td>
+                  
+                  {/* Category ka Column aur Badge */}
                   <td className="p-3 border border-gray-300 text-center">
-                    {txn.type === 'addition' ? 'Aamdani (+)' : 'Kharcha (-)'}
+                    {getCategoryBadge(txn.category)}
                   </td>
-                  <td className="p-3 border border-gray-300 text-right font-bold">
+                  
+                  <td className="p-3 border border-gray-300 text-center text-sm font-medium">
+                    {txn.type === 'addition' ? (
+                      <span className="text-green-600 print:text-black">Aamdani (+)</span>
+                    ) : (
+                      <span className="text-red-600 print:text-black">Kharcha (-)</span>
+                    )}
+                  </td>
+                  <td className="p-3 border border-gray-300 text-right font-bold text-sm">
                     Rs. {Number(txn.price).toLocaleString()}
                   </td>
                 </tr>
@@ -130,7 +155,6 @@ export default function Reports() {
           </tbody>
         </table>
 
-        {/* Print Footer */}
         <div className="mt-8 text-center text-xs text-gray-400 print:block hidden">
           Printed on: {format(new Date(), 'dd MMM yyyy, hh:mm a')} - Asset Manager App
         </div>
