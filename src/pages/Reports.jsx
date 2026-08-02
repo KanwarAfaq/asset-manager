@@ -109,8 +109,12 @@ export default function Reports() {
           </div>
         </div>
 
-        <table className="w-full text-left border-collapse border border-gray-300">
-          <thead>
+        {/* CATEGORIES LIST */}
+<div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+  <div className="overflow-x-auto"> {/* NAYA: Mobile scroll ke liye yeh line shamil ki */}
+    <table className="w-full text-left min-w-[400px]"> {/* min-w-[400px] taake zyada chota na ho */}
+      <thead className="bg-gray-50 border-b border-gray-200">
+        {/* Table ka baqi code same rahay ga */}
             <tr className="bg-gray-100 print:bg-gray-200">
               <th className="p-3 border border-gray-300 font-bold text-sm">Tareekh</th>
               <th className="p-3 border border-gray-300 font-bold text-sm">Tafseel</th>
@@ -154,7 +158,8 @@ export default function Reports() {
             )}
           </tbody>
         </table>
-
+</div>
+</div>
         <div className="mt-8 text-center text-xs text-gray-400 print:block hidden">
           Printed on: {format(new Date(), 'dd MMM yyyy, hh:mm a')} - Asset Manager App
         </div>

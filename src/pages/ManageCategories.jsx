@@ -114,9 +114,12 @@ export default function ManageCategories() {
       {error && <p className="text-red-500 text-sm flex items-center gap-1"><AlertCircle size={16} /> {error}</p>}
 
       {/* CATEGORIES LIST */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b border-gray-200">
+    {/* CATEGORIES LIST */}
+<div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+  <div className="overflow-x-auto"> {/* NAYA: Mobile scroll ke liye yeh line shamil ki */}
+    <table className="w-full text-left min-w-[400px]"> {/* min-w-[400px] taake zyada chota na ho */}
+      <thead className="bg-gray-50 border-b border-gray-200">
+        {/* Table ka baqi code same rahay ga */}
             <tr>
               <th className="p-4 font-semibold text-gray-600">Category</th>
               <th className="p-4 font-semibold text-gray-600 text-right">Action</th>
@@ -142,6 +145,7 @@ export default function ManageCategories() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

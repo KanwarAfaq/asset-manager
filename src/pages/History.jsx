@@ -55,10 +55,11 @@ export default function History() {
 
       {/* 3. TABLE with Added By Column */}
       <h2 className="text-xl font-bold text-gray-800 mb-4">Pichlay 7 Din (Last Week History)</h2>
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
+<div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+  <div className="overflow-x-auto"> {/* NAYA: Mobile scroll ke liye yeh line shamil ki */}
+    <table className="w-full text-left min-w-[400px]"> {/* min-w-[400px] taake zyada chota na ho */}
+      <thead className="bg-gray-50 border-b border-gray-200">
+        {/* Table ka baqi code same rahay ga */}
               <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm font-semibold uppercase tracking-wider">
                 <th className="p-4 pl-6">Tareekh (Date)</th>
                 <th className="p-4">Tafseel (Name)</th>
